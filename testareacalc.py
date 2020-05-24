@@ -7,7 +7,8 @@ def calcarea(a,b,c):
 	print("The area is:  %f" % Area)
 	
 	
-# Calculate the area 	
+# Calculate the area 
+# Adding an additional line to trigger a build
 def area_triangle(a,b,c):
     A = (1.0/4.0) * math.sqrt(
         2*(a**2 * b**2 + a**2 * c**2 + b**2 * c**2) -
