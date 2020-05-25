@@ -1,5 +1,5 @@
 steps:
   - command: "python testareacalc.py"
-    parallelism:  5
+    parallelism:  4
 
   - wait
