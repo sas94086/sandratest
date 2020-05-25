@@ -1,5 +1,6 @@
 steps:
   - command: "python testareacalc.py"
+    label:  "My parallelism test"
     parallelism:  4
 
   - wait
