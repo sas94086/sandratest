@@ -3,4 +3,4 @@ steps:
     plugins:
       - docker#v3.2.0:
           image: "node:8"
-          workdir: .:/app/
+          workdir: .:/app
