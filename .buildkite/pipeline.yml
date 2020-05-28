@@ -1,6 +1,6 @@
-steps:
-  - command: "python testareacalc.py"
-    label:  "My parallelism test"
-    parallelism:  4
-
-  - wait
+- name: "Docker Test %n"
+  command: "python testareacalc.py"
+  plugins:
+    - docker-compose#v3.0.3:
+        run: app
+   parallelism:  5
