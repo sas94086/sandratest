@@ -1,5 +1,5 @@
 - name: "Docker Test %n"
-  command: test.sh
+  command: testareacalc.py
   plugins:
-    - .buildkite/docker-compose.yml#v3.0.3:
+    - docker-compose#v3.0.3:
         run: app
