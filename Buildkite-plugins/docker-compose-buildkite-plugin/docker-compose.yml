@@ -4,3 +4,12 @@ services:
     image: buildkite/plugin-tester
     volumes:
       - ".:/plugin"
+
+- command: generate-dist.sh
+    plugins:
+      - docker-compose#v3.2.0:
+          run: app
+          env:
+            - BUILDKITE_BUILD_NUMBER
+            - BUILDKITE_PULL_REQUEST
+            - MY_CUSTOM_ENV=llamas
