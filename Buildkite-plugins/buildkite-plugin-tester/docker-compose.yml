@@ -1,0 +1,9 @@
+version: '2'
+services:
+  tests:
+    build: .
+    volumes:
+      - "./tests/test-plugin:/plugin"
+  release:
+    build: .
+    image: buildkite/plugin-tester:latest

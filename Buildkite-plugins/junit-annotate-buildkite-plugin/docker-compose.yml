@@ -1,0 +1,14 @@
+version: '2'
+services:
+  plugin:
+    image: buildkite/plugin-tester:latest@sha256:9fc083858d97a83b44b311e3b9c81333469e683eb292c7df08502ae4dd2732f7
+    volumes:
+      - ".:/plugin"
+    depends_on:
+      - ruby
+  ruby:
+    image: ruby:2.7-alpine@sha256:312721e5c292938ad7d2cb1a5b34dc72261f725bdca21f811426e6fe86c6361f
+    command: rake
+    working_dir: /src
+    volumes:
+      - "./ruby:/src"
