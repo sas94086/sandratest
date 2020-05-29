@@ -1,0 +1,11 @@
+{
+  "extends": [
+    "config:base"
+  ],
+  "docker-compose": {
+    "digest": {
+      "enabled": false
+    }
+  },
+  "label": "dependencies"
+}
