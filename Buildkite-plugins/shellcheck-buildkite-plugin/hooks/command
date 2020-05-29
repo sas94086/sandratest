@@ -1,52 +1,78 @@
 #!/bin/bash
-set -eu -o pipefail
 
-# Reads either a value or a list from plugin config
-function plugin_read_list() {
-  local prefix="BUILDKITE_PLUGIN_SHELLCHECK_$1"
-  local parameter="${prefix}_0"
+set -euo pipefail
 
-  if [[ -n "${!parameter:-}" ]]; then
-    local i=0
-    local parameter="${prefix}_${i}"
-    while [[ -n "${!parameter:-}" ]]; do
-      echo "${!parameter}"
-      i=$((i+1))
-      parameter="${prefix}_${i}"
-    done
-  elif [[ -n "${!prefix:-}" ]]; then
-    echo "${!prefix}"
-  fi
+# Stolen from Buildkite's docker-compose plugin
+########################################################################
+
+# Show a prompt for a command
+function plugin_prompt {
+  # Output "$" prefix in a pleasant grey...
+  echo -ne "\033[90m$\033[0m"
+
+  # ...each positional parameter with spaces and correct escaping for copy/pasting...
+  printf " %q" "$@"
+
+  # ...and a trailing newline.
+  echo
 }
 
-IFS=$'\n\t'
-files=()
+# Shows the command being run, and runs it
+function plugin_prompt_and_run {
+  plugin_prompt "$@"
+  "$@"
+}
 
-# Evaluate all the globs and return the files that exist
-for file in $(plugin_read_list FILES) ; do
-  if [[ -e $file ]] ; then
-    files+=("$file")
-  fi
-done
+########################################################################
 
-if [[ -z ${files:-} ]] ; then
-  echo "No files found to shellcheck"
-  exit 1
-fi
-
-# Read in the options to pass to shellcheck.  Ask for color by default
-# for pretty online log display (but someone can override this with an
-# explicit `options: "--color=never"`)
-options=("--color=always")
-while IFS=$'\n' read -r option ; do
-  options+=("$option")
-done < <(plugin_read_list OPTIONS)
-
-BUILDKITE_PLUGIN_SHELLCHECK_VERSION="${BUILDKITE_PLUGIN_SHELLCHECK_VERSION:-stable}"
-
-echo "+++ Running shellcheck on ${#files[@]} files"
-if docker run --rm -v "$PWD:/mnt" --workdir "/mnt" "koalaman/shellcheck:$BUILDKITE_PLUGIN_SHELLCHECK_VERSION" "${options[@]+${options[@]}}" "${files[@]}" ; then
-  echo "Files are ok ✅"
+if [[ ! -z "${BUILDKITE_PLUGIN_SHELLCHECK_OPTS:-}" ]]
+then
+    SHELLCHECK_OPTS=${BUILDKITE_PLUGIN_SHELLCHECK_OPTS}
 else
-  exit 1
+    SHELLCHECK_OPTS=
 fi
+
+# Assemble all the files
+collect_scripts(){
+    local -a scripts
+
+    if [[ ! -z "${BUILDKITE_PLUGIN_SHELLCHECK_SCRIPT:-}" ]]
+    then
+        scripts+=("${BUILDKITE_PLUGIN_SHELLCHECK_SCRIPT}")
+    elif [[ ! -z "${BUILDKITE_PLUGIN_SHELLCHECK_SCRIPT_0:-}" ]]
+    then
+        local i=0
+        local parameter="BUILDKITE_PLUGIN_SHELLCHECK_SCRIPT_${i}"
+        while [[ -n "${!parameter:-}" ]]; do
+            scripts+=("${!parameter}")
+            i=$(( i+1 ))
+            parameter="BUILDKITE_PLUGIN_SHELLCHECK_SCRIPT_${i}"
+        done
+
+    else
+        echo "--- :skull:"
+        exit 1
+    fi
+
+    echo "${scripts[@]}"
+}
+
+shellcheck() {
+    docker run \
+           --volume "$(pwd)":/src/ \
+           --workdir=/src \
+           --env SHELLCHECK_OPTS="${SHELLCHECK_OPTS}" \
+           --tty \
+           --rm \
+           koalaman/shellcheck "$@"
+}
+
+version=$(shellcheck --version | grep "version: " | cut -f2 -d' ')
+
+echo "+++ :shell: Checking scripts with Shellcheck v${version}"
+
+# TODO: Collect error status as we loop through
+for s in $(collect_scripts)
+do
+    plugin_prompt_and_run shellcheck "${s}"
+done
