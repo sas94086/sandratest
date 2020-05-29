@@ -7,7 +7,7 @@ services:
 
 - command: generate-dist.sh
     plugins:
-      - docker-compose#v3.2.0:
+      - docker-compose#v3.3.0:
           run: app
           env:
             - BUILDKITE_BUILD_NUMBER
