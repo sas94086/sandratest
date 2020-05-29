@@ -10,7 +10,7 @@ load '/usr/local/lib/bats/load.bash'
   stub docker \
     "run --rm -v $PWD:/mnt --workdir /mnt koalaman/shellcheck:stable --color=always tests/testdata/test.sh : echo testing test.sh"
 
-  run "$PWD/hooks/command"
+  run "../hooks/command"
 
   assert_success
   assert_output --partial "Running shellcheck on 1 files"
@@ -27,7 +27,7 @@ load '/usr/local/lib/bats/load.bash'
   stub docker \
     "run --rm -v $PWD:/mnt --workdir /mnt koalaman/shellcheck:stable --color=always \"tests/testdata/test.sh tests/testdata/subdir/llamas.sh tests/testdata/subdir/shell with space.sh\"' : echo testing test.sh llamas.sh shell with space.sh"
 
-  run "$PWD/hooks/command"
+  run "../hooks/command"
 
   assert_success
   assert_output --partial "Running shellcheck on 3 files"
@@ -43,7 +43,7 @@ load '/usr/local/lib/bats/load.bash'
   stub docker \
     "run --rm -v $PWD:/mnt --workdir /mnt koalaman/shellcheck:stable --color=always --exclude=SC2086 tests/testdata/subdir/llamas.sh : echo testing llamas.sh"
 
-  run "$PWD/hooks/command"
+  run "../hooks/command"
 
   assert_success
   assert_output --partial "Running shellcheck on 1 files"
@@ -61,7 +61,7 @@ load '/usr/local/lib/bats/load.bash'
   stub docker \
     "run --rm -v $PWD:/mnt --workdir /mnt koalaman/shellcheck:stable --color=always --exclude=SC2086 --format=gcc -x tests/testdata/subdir/llamas.sh : echo testing llamas.sh"
 
-  run "$PWD/hooks/command"
+  run "../hooks/command"
 
   assert_success
   assert_output --partial "Running shellcheck on 1 files"
@@ -81,7 +81,7 @@ load '/usr/local/lib/bats/load.bash'
   stub docker \
     "run --rm -v $PWD:/mnt --workdir /mnt koalaman/shellcheck:stable --color=always --exclude=SC2086 --format=gcc -x \"tests/testdata/test.sh tests/testdata/subdir/llamas.sh tests/testdata/subdir/shell with space.sh\"' : echo testing test.sh llamas.sh shell with space.sh"
 
-  run "$PWD/hooks/command"
+  run "../hooks/command"
 
   assert_success
   assert_output --partial "Running shellcheck on 3 files"
@@ -96,7 +96,7 @@ load '/usr/local/lib/bats/load.bash'
   stub docker \
     "run --rm -v $PWD:/mnt --workdir /mnt koalaman/shellcheck:stable --color=always tests/testdata/test.sh tests/testdata/subdir/llamas.sh tests/testdata/subdir/shell\ with\ space.sh' : echo shellcheck failed; exit 1"
 
-  run "$PWD/hooks/command"
+  run "../hooks/command"
 
   assert_failure
   assert_output --partial "Running shellcheck on 1 files"
